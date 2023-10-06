@@ -1,0 +1,498 @@
+
+Pandas 
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+al importar
+import numpy as np
+import pandas as pd
+import matplotlib.pylab as plt
+plt.style.use('ggplot') # hoja de estilo para los gráficos
+pd.set_option('max_columns', 200) # expandir la cantidad de columnas que se ven en el cuaderno
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+# imprime todo el dataframe en string(funciona con columnas)
+import pandas as pd
+df = pd.read_csv('data.csv')
+print(df.to_string()) 
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+ver primeros 5 registros(o los que se le pase por parámetro), debe ser un entero
+df.head() # df.head(10), df.head(3)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+ver últimos 5 registros(o los que se le pase por parámetro), debe ser un entero
+df.tail() # df.tail(10), df.tail(3)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+ver una muestra aleatoria de los datos
+df.sample(frac=1)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+ver cuantas filas y columnas tiene el dataframe
+df.shape
+con un print queda mejor
+print(f"Filas:{df.shape[0]}, Columnas:{df.shape[1]}")
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+ver información del dataframe
+df.info()
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+ver los tipos de datos del dataframe
+df.dtypes
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+ver cuantas variables de cada tipo de dato tenemos en el conjunto de datos
+df.dtypes.value_counts()
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+ver estadísticas del dataframe
+df.describe()
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+ver si existen valores nulos explícitos en el conjunto de datos
+df.isnull().any()
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+ver recuento de nulos por cada columna
+df.isna().sum()
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+ver recuento de nulos de todo el conjunto de datos
+df.isna().sum().sum()
+df.isnull().sum().sum()
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+ver las columnas del dataframe
+df.columns
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+es recomendable eliminar las columnas que creemos que no son relevantes
+Eliminar columnas, puede ser una
+df.drop(['invoice', 'client', 'units'], axis=1)
+df.drop(['columna'], axis=1)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+una mejor forma que permite visualizar las columnas y elegir las que no necesitemos(cuando son muchas)
+1-hacer df.columns
+2-copiar el resultado dentro de: df = df[['columnas']].copy(), el .copy() asegura que es un conjunto de datos nuevo y no una referencia
+3-eliminas o comentas la columna o las filas de columnas
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+# cambiar el tipo de dato de la columna
+df['columna'] = df['columna'].astype("int")
+df['columna'] = df['columna'].astype(("object")
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+cambiar el tipo de dato de una columna fecha object a fecha datetime
+df['columna'] = pd.to_datetime(df['columna'])
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+a numérica
+df['columna'] = pd.to_numeric(df['columna'])
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+renombrar columnas
+df = df.rename(columns={'nombre_anterior':'nombre_nuevo'}) # se pueden agregar mas, debe separarlas con coma en el diccionario
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+contar nulos - valores faltantes
+df.isna() # si se ejecuta así, muestra el dataframe con las filas rellenas con False o True
+df.isna().sum() # con esto nos da un recuento por columna
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+datos duplicados, este método muestra el segundo duplicado
+df.duplicated() # si se ejecuta así, muestra el dataframe con las filas rellenas con False o True
+df.loc[df.duplicated()]
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+si queremos ver duplicados en una columna
+df.loc[df.duplicated(subset=df['columna'])]
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+si queremos ver el dato duplicado
+df.query('columna == "dato_fila"')
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+si queremos eliminar duplicados por columnas
+primero los sumamos
+df.duplicated(subset=df['columna1', 'columna2', 'columa3']).sum()
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+luego seleccionamos el inverso
+df = df.loc[~df.duplicated(subset=df['columna1', 'columna2', 'columa3'])]
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+resetear el índice esto es necesario porque al eliminar filas quedan saltos de números
+al final de la instrucción anterior agregar: .reset_index(drop=True)
+el drop=True es para que elimine el índice anterior
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+guardamos el dataset
+df = df.loc[~df.duplicated(subset=df['columna1', 'columna2', 'columa3'])].reset_index(drop=True).copy()
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Elimine las filas con un valor NULL en la columna "Fecha":
+df.dropna(subset=['Date'], inplace = True)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Elimine todas las filas con valores NULL:
+df.dropna(inplace = True)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Reemplace los valores NULL con el número 130:(ojo: todo el df)
+df.fillna(130, inplace = True)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Reemplazar sólo para columnas especificadas
+El ejemplo anterior reemplaza todas las celdas vacías en todo el marco de datos.
+Para reemplazar solo los valores vacíos de una columna, especifique el nombre de columna para el DataFrame:
+df["Calories"].fillna(130, inplace = True)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Reemplazar usando Media, Mediana o Modo
+Una forma común de reemplazar celdas vacías es calcular la media, mediana o valor de modo de la columna.
+Pandas utiliza los métodos y para Calcule los valores respectivos para una columna especificada:mean()median()mode()
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Ejemplo
+Calcule la MEDIA y reemplace los valores vacíos con ella:
+x = df["Calories"].mean()
+df["Calories"].fillna(x, inplace = True)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Ejemplo
+Calcule la MEDIANA, y reemplace cualquier valor vacío con él:
+x = df["Calories"].median()
+df["Calories"].fillna(x, inplace = True)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Ejemplo
+Calcule la MODA y reemplace los valores vacíos con él:
+x = df["Calories"].mode()[0]
+df["Calories"].fillna(x, inplace = True)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Media = el valor promedio (la suma de todos los valores dividida por el número de valores).
+Mediana = el valor en el medio, después de haber ordenado todos los valores ascendente.
+Mode = el valor que aparece con más frecuencia.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Convertir a un formato correcto
+Ejemplo
+Convertir a fecha:
+df['Date'] = pd.to_datetime(df['Date'])
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Sustitución de valores
+Una forma de corregir valores incorrectos es reemplazarlos con otra cosa.
+En nuestro ejemplo, lo más probable es que sea un error tipográfico, y el valor debe ser "45" en lugar de "450", y 
+Nosotros podríamos simplemente insertar "45" en la fila 7:
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Ejemplo
+Establezca "Duración" = 45 en la fila 7:
+df.loc[7, 'Duration'] = 45
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Para conjuntos de datos pequeños, es posible que pueda reemplazar los datos incorrectos uno por uno, pero no para grandes 
+conjuntos de datos.
+Para reemplazar datos incorrectos por conjuntos de datos más grandes, puede crear algunas reglas, por ejemplo: 
+Establezca algunos límites para los valores legales y reemplace los valores que estén fuera de la Límites.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Ejemplo
+Repase todos los valores de la columna "Duración".
+Si el valor es superior a 120, establézcalo en 120:
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+for x in df.index:
+  if df.loc[x, "Duration"] > 120:
+    df.loc[x, "Duration"] = 120
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Eliminación de filas
+Otra forma de manejar datos incorrectos es eliminar las filas que contienen datos incorrectos.
+De esta manera, no tiene que averiguar con qué reemplazarlos, es muy probable que no los necesite para hacer sus análisis.
+
+Ejemplo
+Elimine las filas donde "Duración" es superior a 120:
+
+for x in df.index:
+  if df.loc[x, "Duration"] > 120:
+    df.drop(x, inplace = True)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Para descubrir duplicados, podemos usar el método.duplicated()
+El método devuelve valores booleanos para cada fila:duplicated()
+
+Ejemplo
+Devuelve para cada fila que es un duplicado, othwerwise :TrueFalse
+print(df.duplicated())
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Suma todos los duplicados
+print(df.duplicated().sum())
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Eliminación de duplicados
+Para eliminar duplicados, utilice el método.drop_duplicates()
+
+Ejemplo
+Eliminar todos los duplicados:
+df.drop_duplicates(inplace = True)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+=================================================================================
+Una vez limpio el dataset.
+-Ver las características(features) de cada columna: esto es importante para comprender cual es la distribución de
+esas características
+
+¿Que estadísticos describen el conjunto de datos?
+Todas las variables
+df.describe(include='all') # include='all' - incluye todas las columnas, si no se coloca incluye solo las numéricas
+
+Solo las numéricas
+df.describe(include=np.number) # o sin parámetros
+
+Solo categorías: Tipos de datos object
+df.describe(include=object)
+
+Configurar tipo de dato category a los que son object(o a cualquier otro)
+df.astype(
+        {
+        'species': 'category',
+        'island': 'category',
+        'sex': 'category'
+        }
+    )
+    .dtypes
+# No guarda los datos, En caso de que quieras guardarlos deberas sobreescribir los datos
+
+esto cuenta cuantos valores de cada uno hay
+df['columna'].value_count() # ej: si la columna es fechas, nos dirá cuantas veces aparece cada año: 1999 - 46 veces
+
+Visualizar los conteos
+Pandas
+penguins_df
+    .species # columna
+    .value_counts()
+    .plot(
+        kind='bar'
+    )
+
+Seaborn
+sns.catplot(
+    data=df, 
+    x='columna', 
+    kind='count',
+    palette=penguin_color, # ojo esta es de un dataset de pinguinos
+)
+
+¿Cuál es el valor máximo de las variables?
+df.max(numeric_only=True)
+
+¿Cuál es el valor mínimo de las variables?
+df.min(numeric_only=True)
+
+¿Cuál es el rango de las variables?
+np.subtract(df.max(numeric_only=True), df.min(numeric_only=True))
+
+¿Cuál es la desviación estándar de las variables?
+df.std(numeric_only=True)
+
+¿Como puedo visualizar los coeficientes de correlación?
+Heatmap
+sns.heatmap(
+    data=df.corr(),
+    cmap=sns.diverging_palette(20,238, as_cmap=True),
+    center=0,
+    vmin=-1,
+    vmax=1,
+    linewidth=.5,
+    annot=True,
+)
+
+Clustermap
+Otra opción es graficar con un Clustermap, el cual nos retorna un gráfico parecido al heatmap, pero con los valores ordenados, teniendo una esquina donde se nos concentran nuestras correlaciones positivas.
+
+sns.clustermap(
+    data=df.corr(),
+    cmap=sns.diverging_palette(20,238, as_cmap=True),
+    center=0,
+    vmin=-1,
+    vmax=1,
+    linewidth=.5,
+    annot=True,
+)
+
+
+graficamos solo los primeros lugares de algo
+df['columna'].value_count().head(10).plot(kind='bar', title='título del gráfico') # si queremos escribir mas código en otra linea usar \ para separar por línea
+
+guardamos en una variable para agregar mas cosas
+ax = df['columna'].value_count().head(10).plot(kind='bar', title='título del gráfico')
+
+colocar los nombres de las etiquetas de los ejes
+ax.set_xlabel('nombre etiqueta en el eje X')
+ax.set_label('nombre etiqueta en el eje Y')
+
+ver la distribución de los datos de una columna
+un histograma nos muestra en diferentes contenedores cual es el recuento de ese valor, para un valor contínuo como
+por ejemplo la velocidad es bueno ejecutar un histograma, podemos variar el tamaño de los contenedores con bins=, agregar
+un título y asignar esta consulta a una variable
+df['columna'].plot(kind='hist')
+ax = df['columna'].plot(kind='hist', bins=20, title='')
+ax.set_xlabel('nombre etiqueta en el eje X')
+fijarse en el ancho del gráfico ya que si queda espacio vacío entre los bins y el final es que ahí hay datos,
+posiblemente outliers
+
+hacer lo mismo de arriba pero con gráfico de densidad queda menos abarrotado y mas fácil de interpretar
+ax = df['columna'].plot(kind='kde', bins=20, title='')
+ax.set_xlabel('nombre etiqueta en el eje X')
+
+Relaciones entre caractrísticas(columnas)
+scatterplot
+heatmap correlation
+pairplot
+groupby comparisons
+
+hay varias cosas que se pueden hacer para comparar las diferentes características(columnas), en un conjunto de datos,
+una de ellas es comparar 2 características una al lado de la otra y haciendo un diagrama de dispersión(scatterplot)
+df.plot(kind=scatter,
+	x = 'columna',
+	y = 'columna',
+	title= '')
+si se deja así solo crea un objeto, debe agregarsele al final
+plt.show()
+Esto se hizo con la funcionalidad básica de pandas, podemos usar seaborn para hacer análisis y gráficos 
+un poco mas avanzados:
+sns.scatterplot(x='columna',
+		y='columna',
+		hue='columna' # esto nos da un color para distinguir en el gráfico y una leyenda
+		data=df)
+
+Para comparar multiples características.
+sns.pairplot(df, vars=['columna1', 'columna1',
+		       'columna1', 'columna1', 'columna1'],
+			hue='columna')
+plt.show()
+
+Ver la correlación entre características
+df[['columna', 'columna', 
+    'columna', 'columna', 'columna1']].dropna().corr() # .dropna() para eliminar nulos si los hay
+
+Ver la correlación entre características pero con un mapa de calor
+asignamos el código anterior a un dataframe:
+df_corr = df[['columna', 'columna', 
+    'columna', 'columna', 'columna1']].dropna().corr()
+
+y se lo pasamos a la función de seaborn
+sns.heatmap(df_corr)
+
+si queremos ver lo valores de la correlación dentro de los cuadros:
+sns.heatmap(df_corr, annot=True)
+
+codigo de una consulta del video
+ax = df.query('Location != "Other"') \
+	.groupby('Location')['Speed_mph'] \
+	.agg(['mean', 'count']) \
+	.query('count >= 10') \
+	.sort_values('mean')['mean'] \
+	.plot(kind='barh', figsize=(12, 5), title='título')
+ax.set_xlabel('título')
+
+
+
+
+df.isna().sum / df.shape[0].sort_values().plot(kind="bar")
+
+df.describe(percentiles=[0.25, 0.5, 0.75, 0.05, 0.95])
+
+df.describe(include=["object"])
+
+df.hist()
+df.iloc[:,0:4].hist() # [:,0:4] se refiere a las columnas cuando son muchas
+df.iloc[:,0:4].hist(bins=200)
+df.iloc[:,0:4].hist(bins="rice")
+
+df[['columna']].boxplot()
+df[['columna', 'columna']].boxplot()
+df[:, 0:5].boxplot()
+df.boxplot(figsize=(20,10))
+
+df[['columna']].hist()
+
+sns.pairplot(df.iloc[:, 0:5])
+sns.pairplot(df.iloc[0:100, 0:5], kind="hist")                   
+sns.pairplot(df.iloc[:, 0:5], kind="kde")
+sns.pairplot(df.iloc[:, 0:5], corner=True)
+sns.pairplot(df, x_vars=['columna1', 'columna2'], y_vars=['columna1', 'columna2', 'columna3'])
+sns.pairplot(df, x_vars=['columna1', 'columna2'], y_vars=['columna1', 'columna2', 'columna3'], hue="columna")
+
+sns.histplot(df, x="columna", hue="columna", multiple="stack") # supuestamente para predecir el valor de otra variable categórica
+en el ejemplo x="mean radius" hue="target"
+
+df2 = df.groupby('columna')[df2.columns[5:13]].mean().sort_values(by="columna", ascending=False)
+df2 = df.groupby('columna')['columna1', 'columna2', 'columna3'].mean().sort_values(by="columna", ascending=False)
+df2.plot()
+
+df.dtypes()
+df.select_dtypes(include="number")
+df.select_dtypes(include="object")
+df.select_dtypes(include="float")
+
+df['Date'] = pd.to_datetime(df['Date'])
+df['Year'] = df['Date'].dt.year
+df['Day'] = df['Date'].dt.day
+df['Month'] = df['Date'].dt.month
